@@ -1,4 +1,4 @@
-// src/db.js
+// src/db.ts
 const { Pool } = require('pg');
 const fs = require('fs');
 
@@ -11,35 +11,31 @@ const pool = new Pool({
 });
 
 //function to create the tables in the database (execute create.sql which is in the folder database)
-const createTables = () => {
-    const createTables = fs.readFileSync('../../database/create.sql').toString();
+export const createTables = () => {
+    const createTables = fs.readFileSync('../database/create.sql').toString();
     pool.query(createTables)
-        .then((res) => {
+        .then((res: any) => {
             console.log(res);
             console.log('Tables created successfully');
         })
-        .catch((err) => {
+        .catch((err: any) => {
             console.log(err);
         });
 };
 
 //fill the tables with data (execute insert.sql which is in the folder database)
-const fillTables = () => {
-    const insertTables = fs.readFileSync('../../database/insert.sql').toString();
+export const fillTables = () => {
+    const insertTables = fs.readFileSync('../database/insert.sql').toString();
     pool.query(insertTables)
-        .then((res) => {
+        .then((res : any) => {
             console.log(res);
             console.log('Tables filled successfully');
         })
-        .catch((err) => {
+        .catch((err : any) => {
             console.log(err);
         });
 };
 
-module.exports = {
-    query: (text, params) => pool.query(text, params),
-    createTables,
-    fillTables
-};
-
+//function to query the database
+export const query = (text: any, params: any) => pool.query(text, params);
 

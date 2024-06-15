@@ -1,7 +1,6 @@
-import { Elysia } from "elysia";
+// index.ts
+import app from './routes/userRoutes';
 
-const app = new Elysia().get("/", () => "Welcome to communiKen web server").listen(3000);
-
-console.log(
-  `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
-);
+app.listen(3000, () => {
+    console.log('Server is running on http://localhost:3000');
+});
