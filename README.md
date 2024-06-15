@@ -1,4 +1,3 @@
-```markdown
 ## Project Setup
 
 To be able to run the project, follow these steps:
@@ -79,4 +78,3 @@ python prompt.py
 - Set the password of the `postgres` user to `020202` (or modify the configuration in `db.ts`).
 - Create a database named `communiken`.
 - Execute the two SQL scripts to create the tables and insert data for test purposes.
-```
