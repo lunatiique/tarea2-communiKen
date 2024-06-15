@@ -2,14 +2,41 @@ To be able to run the project :
 - Install bun (https://bun.sh/docs/installation)
 - Install python
 
-Dependencies api :
+Dependencies api to add :
 - bun add pg
-- bun add fs
+- bun add typescript @types/node @types/pg    
 
 To run web server : 
-- cd api
-- bun run src/index.t
-- go to http://localhost:3000 to see result
+- bun run api/src/index.ts
+- Here are the endpoints available :
+  - POST /api/registrar 
+    - {
+"direccion_correo": "alice@example.com",
+"nombre": "Alice",
+"clave": " alice123 ",
+"descripcion": "Descripcion de alice"
+}
+  - POST /api/bloquear
+      - {
+"direccion_correo": "alice@example.com",
+"clave": "alice123",
+"direccion_bloqueada": 3
+}
+  - GET /api/infomacion/:correo:
+    - You have to replace correo by an email adress, for example : GET /api/informacion/alice@example.com
+  - POST /api/marcarcorreo
+    - {
+"direccion_correo": "alice@example.com",
+"clave": "alice123",
+"direccion_favorita": 2,
+"categoria": "friends"
+}
+  - DELETE /api/desmarcarcorreo
+    - {
+"direccion_correo": "alice@example.com",
+"clave": "alice123",
+"direccion_favorita": 2
+}
   
 To run client prompt :
 - cd client
@@ -20,4 +47,4 @@ To run database :
 - Run on your localhost
 - Set the password of postgres user to 020202 (or modify config in db.js)
 - Create a database named 'communiken'
-- execute the initialize_database.js script to create the tables and fill them with example data for test purposes.
+- compile typescript to javascript with the command : 
