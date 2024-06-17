@@ -1,6 +1,6 @@
 // src/controllers/userController.ts
 import { Context } from 'elysia';
-import { addUser, blockUser, getUserByEmail, addFavoriteEmail, removeFavoriteEmail } from '../models/userModel';
+import { addUser, blockUser, getUserByEmail, addFavoriteEmail, removeFavoriteEmail, seeListOffavoriteEmail } from '../models/userModel';
 
 interface RegisterUserBody {
     direccion_correo: string;
@@ -65,6 +65,18 @@ export const getUserInfo = async (ctx: Context) => {
         return { status: 400, message: "There was an error in making the request", error: (err as Error).message };
     }
 };
+
+
+export const getListOffavoriteEmails = async (ctx: Context) => {
+    try {
+        const { correo } = await ctx.params;
+        const list = await seeListOffavoriteEmail(correo);
+        return { status: 200, list };
+    } catch (err) {
+        return { status: 400, message: "There was an error in making the request", error: (err as Error).message };
+    }
+}
+
 
 export const authenticateUser = async (ctx: Context) => {
     try {
