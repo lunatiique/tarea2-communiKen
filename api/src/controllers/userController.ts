@@ -66,6 +66,20 @@ export const getUserInfo = async (ctx: Context) => {
     }
 };
 
+export const authenticateUser = async (ctx: Context) => {
+    try {
+        const { direccion_correo, clave } = await ctx.body as { direccion_correo: string, clave: string };
+        const user = await getUserByEmail(direccion_correo);
+        if (user && user.clave === clave) {
+            return { status: 200, message: "The user is authenticated" };
+        } else {
+            return { status: 400, message: "Wrong email or password"};
+        }
+    } catch (err) {
+        return { status: 400, message: "There was an error in making the request", error: (err as Error).message };
+    }
+};
+
 export const bookmarkEmail = async (ctx: Context) => {
     try {
         const { direccion_correo, clave, direccion_favorita, categoria } = await ctx.body as BookmarkEmailBody;
