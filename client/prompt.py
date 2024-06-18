@@ -64,9 +64,10 @@ def get_favorite_emails(email):
             print("Email addresses marked as favorites:")
             i = 1
             for email in response.json()["list"]:
+                print("email : ", email)
                 print()  # Add an empty line for better readability
                 print("Favorite ", i)
-                print("   Email: ", email["direccion_correo"])
+                print("   Email: ", email["direccion_favorita"])
                 print("   Category: ", email["categoria"])
                 i += 1
                 print()  # Add an empty line for better readability
@@ -86,7 +87,7 @@ def mark_email_favorite(email, password, favorite_email, category):
             print()
             #verify if code of json response is defined 
             if "code" in response.json():
-                if response.json()["code"] == "23505":
+                if response.json()["code"] == "P2002":
                     print("Error: Email already marked as favorite.")
                 else:
                     print("Error: ", response.json()["error"])

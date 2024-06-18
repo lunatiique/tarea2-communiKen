@@ -1,6 +1,6 @@
 CREATE TABLE usuario (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    direccion_correo VARCHAR NOT NULL,
+    direccion_correo VARCHAR NOT NULL UNIQUE,
     clave VARCHAR NOT NULL,
     nombre VARCHAR NOT NULL,
     descripcion TEXT,

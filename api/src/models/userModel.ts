@@ -1,12 +1,11 @@
 // src/models/userModel.ts
-import { rejects } from 'assert';
-import { query } from '../db';
+import prisma from '../db';
 
 interface User {
     direccion_correo: string;
     clave: string;
     nombre: string;
-    descripcion: string;
+    descripcion?: string;
     fecha_creacion: Date;
 }
 
@@ -14,7 +13,7 @@ interface FavoriteEmail {
     usuario_id: number;
     direccion_favorita: number;
     fecha_agregado: Date;
-    categoria: string;
+    categoria?: string;
 }
 
 interface BlockedEmail {
@@ -25,40 +24,50 @@ interface BlockedEmail {
 
 export const addUser = async (user: User) => {
     const { direccion_correo, clave, nombre, descripcion, fecha_creacion } = user;
-    const text = 'INSERT INTO usuario(direccion_correo, clave, nombre, descripcion, fecha_creacion) VALUES($1, $2, $3, $4, $5) RETURNING *';
-    const values = [direccion_correo, clave, nombre, descripcion, fecha_creacion];
-    const res = await query(text, values);
-    return res.rows[0];
+    const newUser = await prisma.usuario.create({
+        data: {
+            direccion_correo,
+            clave,
+            nombre,
+            descripcion,
+            fecha_creacion,
+        },
+    });
+    return newUser;
 };
 
 export const blockUser = async (email: string, clave: string, direccion_bloqueada: number): Promise<void> => {
     const user = await getUserByEmail(email);
     if (!user || user.clave !== clave) {
-        const showError = 'Invalid email or password '+ email + ' ' + clave + ' ';
+        const showError = 'Invalid email or password ' + email + ' ' + clave + ' ';
         throw new Error(showError);
     }
     const fecha_bloqueo = new Date();
-    const text = 'INSERT INTO direccion_bloqueada(usuario_id, direccion_bloqueada, fecha_bloqueo) VALUES($1, $2, $3) RETURNING *';
-    const values = [user.id, direccion_bloqueada, fecha_bloqueo];
-    const res = await query(text, values);
-    return res.rows[0];
+    await prisma.direccion_bloqueada.create({
+        data: {
+            usuario_id: user.id,
+            direccion_bloqueada,
+            fecha_bloqueo,
+        },
+    });
 };
 
 export const getUserByEmail = async (direccion_correo: string) => {
-    const text = 'SELECT id, nombre, clave, direccion_correo, descripcion FROM usuario WHERE direccion_correo = $1'
-    const values = [direccion_correo];
-    const res = await query(text, values);
-    return res.rows[0];
+    const user = await prisma.usuario.findUnique({
+        where: { direccion_correo: direccion_correo },
+    });
+    return user;
 };
 
 export const getEmailbyUserId = async (id: number) => {
-    const text = 'SELECT direccion_correo FROM usuario WHERE id = $1'
-    const values = [id];
-    const res = await query(text, values);
-    return res.rows[0];
+    const user = await prisma.usuario.findUnique({
+        where: { id },
+        select: { direccion_correo: true },
+    });
+    return user;
 };
 
-export const addFavoriteEmail = async (email: string, clave: string, direccion_favorita: string, categoria: string) => {
+export const addFavoriteEmail = async (email: string, clave: string, direccion_favorita: string, categoria?: string) => {
     const user = await getUserByEmail(email);
     const favorite = await getUserByEmail(direccion_favorita);
     if (!user || user.clave !== clave) {
@@ -68,10 +77,15 @@ export const addFavoriteEmail = async (email: string, clave: string, direccion_f
         throw new Error('Invalid favorite email');
     }
     const fecha_agregado = new Date();
-    const text = 'INSERT INTO direccion_favorita(usuario_id, direccion_favorita, fecha_agregado, categoria) VALUES($1, $2, $3, $4) RETURNING *';
-    const values = [user.id, favorite.id, fecha_agregado, categoria];
-    const res = await query(text, values);
-    return res.rows[0];
+    const favoriteEmail = await prisma.direccion_favorita.create({
+        data: {
+            usuario_id: user.id,
+            direccion_favorita: favorite.id,
+            fecha_agregado,
+            categoria,
+        },
+    });
+    return favoriteEmail;
 };
 
 export const removeFavoriteEmail = async (email: string, clave: string, direccion_favorita: number) => {
@@ -79,10 +93,13 @@ export const removeFavoriteEmail = async (email: string, clave: string, direccio
     if (!user || user.clave !== clave) {
         throw new Error('Invalid email or password');
     }
-    const text = 'DELETE FROM direccion_favorita WHERE usuario_id = $1 AND direccion_favorita = $2 RETURNING *';
-    const values = [user.id, direccion_favorita];
-    const res = await query(text, values);
-    return res.rows[0];
+    const removedFavorite = await prisma.direccion_favorita.deleteMany({
+        where: {
+            usuario_id: user.id,
+            direccion_favorita,
+        },
+    });
+    return removedFavorite;
 };
 
 export const seeListOffavoriteEmail = async (email: string) => {
@@ -90,14 +107,25 @@ export const seeListOffavoriteEmail = async (email: string) => {
     if (!user) {
         throw new Error('Invalid email');
     }
-    const text = 'SELECT direccion_favorita, fecha_agregado, categoria FROM direccion_favorita WHERE usuario_id = $1';
-    const values = [user.id];
-    const res = await query(text, values);
-    // transform the id in email address for better understanding of the response
-    for (let i = 0; i < res.rows.length; i++) {
-        res.rows[i].direccion_correo = await getEmailbyUserId(res.rows[i].direccion_favorita);
-        // remove the double direccion_correo property
-        res.rows[i].direccion_correo = res.rows[i].direccion_correo.direccion_correo;
+    const favorites = await prisma.direccion_favorita.findMany({
+        where: {
+            usuario_id: user.id,
+        },
+        select: {
+            direccion_favorita: true,
+            fecha_agregado: true,
+            categoria: true,
+        },
+    });
+
+    // Transform the id in email address for better understanding of the response
+    for (let i = 0; i < favorites.length; i++) {
+        const userEmail = await getEmailbyUserId(favorites[i].direccion_favorita);
+        if (userEmail) {
+            favorites[i].direccion_favorita = userEmail.direccion_correo as unknown as number;
+        } else {
+            throw new Error('Favorite email not found');
+        }
     }
-    return res.rows;
+    return favorites;
 };

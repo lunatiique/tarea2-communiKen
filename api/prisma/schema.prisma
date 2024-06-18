@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model correo {
+  id                                      Int      @id @default(autoincrement())
+  remitente_id                            Int
+  destinatario_id                         Int
+  asunto                                  String?  @db.VarChar
+  cuerpo                                  String?
+  fecha_envio                             DateTime @db.Date
+  leido                                   Boolean?
+  es_favorito                             Boolean?
+  usuario_correo_destinatario_idTousuario usuario  @relation("correo_destinatario_idTousuario", fields: [destinatario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuario_correo_remitente_idTousuario    usuario  @relation("correo_remitente_idTousuario", fields: [remitente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model direccion_bloqueada {
+  usuario_id                                               Int
+  direccion_bloqueada                                      Int
+  fecha_bloqueo                                            DateTime @db.Date
+  usuario_direccion_bloqueada_direccion_bloqueadaTousuario usuario  @relation("direccion_bloqueada_direccion_bloqueadaTousuario", fields: [direccion_bloqueada], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuario_direccion_bloqueada_usuario_idTousuario          usuario  @relation("direccion_bloqueada_usuario_idTousuario", fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([usuario_id, direccion_bloqueada])
+}
+
+model direccion_favorita {
+  usuario_id                                             Int
+  direccion_favorita                                     Int
+  fecha_agregado                                         DateTime @db.Date
+  categoria                                              String?  @db.VarChar
+  usuario_direccion_favorita_direccion_favoritaTousuario usuario  @relation("direccion_favorita_direccion_favoritaTousuario", fields: [direccion_favorita], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuario_direccion_favorita_usuario_idTousuario         usuario  @relation("direccion_favorita_usuario_idTousuario", fields: [usuario_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([usuario_id, direccion_favorita])
+}
+
+model usuario {
+  id                                                                   Int                   @id @default(autoincrement())
+  direccion_correo                                                     String                @unique @db.VarChar
+  clave                                                                String                @db.VarChar
+  nombre                                                               String                @db.VarChar
+  descripcion                                                          String?
+  fecha_creacion                                                       DateTime              @db.Date
+  correo_correo_destinatario_idTousuario                               correo[]              @relation("correo_destinatario_idTousuario")
+  correo_correo_remitente_idTousuario                                  correo[]              @relation("correo_remitente_idTousuario")
+  direccion_bloqueada_direccion_bloqueada_direccion_bloqueadaTousuario direccion_bloqueada[] @relation("direccion_bloqueada_direccion_bloqueadaTousuario")
+  direccion_bloqueada_direccion_bloqueada_usuario_idTousuario          direccion_bloqueada[] @relation("direccion_bloqueada_usuario_idTousuario")
+  direccion_favorita_direccion_favorita_direccion_favoritaTousuario    direccion_favorita[]  @relation("direccion_favorita_direccion_favoritaTousuario")
+  direccion_favorita_direccion_favorita_usuario_idTousuario            direccion_favorita[]  @relation("direccion_favorita_usuario_idTousuario")
+}

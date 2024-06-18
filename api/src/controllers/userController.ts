@@ -54,9 +54,6 @@ export const getUserInfo = async (ctx: Context) => {
         const { correo } = ctx.params;
         const user = await getUserByEmail(correo);
         if (user) {
-            // Remove the password and the id from the user object
-            delete user.clave;
-            delete user.id;
             return { status: 200, ...user };
         } else {
             return { status: 400, message: "User not found" };
