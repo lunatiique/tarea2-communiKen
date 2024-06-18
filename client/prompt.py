@@ -27,15 +27,17 @@ def authenticate(email, password):
         #check if status element of json response is 200
         return response.json()["status"] == 200
     except requests.exceptions.ConnectionError:
-        print("Error: Timeout")
+        print("Issue with webserver. Please try again later.")
         return False
 
 # Function to display menu
 def display_menu():
+    print()
     print("1. View information about an email address")
     print("2. View email addresses marked as favorites")
     print("3. Mark email addresses as favorites")
     print("4. Terminate the client execution")
+    print()
 
 # Function to get email information
 def get_email_info(email):
@@ -69,7 +71,8 @@ def get_favorite_emails(email):
                 i += 1
                 print()  # Add an empty line for better readability
         elif response.json()["status"] != 200:
-            print("Error:", response.json()["message"])
+            print(response.json()["message"])
+            print("Error:", response.json()["error"])
     except requests.exceptions.ConnectionError:
         print("Issue with webserver. Please try again later.")
 
@@ -77,8 +80,22 @@ def get_favorite_emails(email):
 def mark_email_favorite(email, password, favorite_email, category):
     url = base_url + endpoints["marcarcorreo"]
     data = {"direccion_correo": email, "clave": password, "direccion_favorita": favorite_email, "categoria": category}
-    response = requests.post(url, json=data)
-    return response.status_code == 200
+    try:
+        response = requests.post(url, json=data)
+        if response.json()["status"] != 200:
+            print()
+            #verify if code of json response is defined 
+            if "code" in response.json():
+                if response.json()["code"] == "23505":
+                    print("Error: Email already marked as favorite.")
+                else:
+                    print("Error: ", response.json()["error"])
+            else:
+                print("Error: ", response.json()["error"])
+        return response.json()["status"] == 200
+    except requests.exceptions.ConnectionError:
+        print("Issue with webserver. Please try again later.")
+        return False
 
 # Main function
 def main():
@@ -94,21 +111,30 @@ def main():
         choice = input("Enter your choice: ")
 
         if choice == "1":
+            print()
             email = input("Enter the email address: ")
+            print()
             get_email_info(email)
         elif choice == "2":
+            print()
             get_favorite_emails(email_connected)
         elif choice == "3":
+            print()
             favorite_email = input("Enter the email address to mark as favorite: ")
-            category = input("Enter the category: ")
-            if mark_email_favorite(email, password, favorite_email, category):
+            category = input("Enter the category (you can leave it empty): ")
+            print()
+            if mark_email_favorite(email_connected, password, favorite_email, category):
                 print("Email address marked as favorite.")
+                print()
             else:
                 print("Failed to mark email address as favorite.")
+                print()
         elif choice == "4":
+            print()
             print("Exiting...")
             break
         else:
+            print()
             print("Invalid choice. Please try again.")
 
 if __name__ == "__main__":
