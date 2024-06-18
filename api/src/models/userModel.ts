@@ -36,17 +36,20 @@ export const addUser = async (user: User) => {
     return newUser;
 };
 
-export const blockUser = async (email: string, clave: string, direccion_bloqueada: number): Promise<void> => {
+export const blockUser = async (email: string, clave: string, direccion_bloqueada: string): Promise<void> => {
     const user = await getUserByEmail(email);
+    const blocked = await getUserByEmail(direccion_bloqueada);
     if (!user || user.clave !== clave) {
-        const showError = 'Invalid email or password ' + email + ' ' + clave + ' ';
-        throw new Error(showError);
+        throw new Error('Invalid email or password');
+    }
+    if (!blocked) {
+        throw new Error('Invalid blocked email');
     }
     const fecha_bloqueo = new Date();
     await prisma.direccion_bloqueada.create({
         data: {
             usuario_id: user.id,
-            direccion_bloqueada,
+            direccion_bloqueada: blocked.id,
             fecha_bloqueo,
         },
     });

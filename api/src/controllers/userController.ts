@@ -12,7 +12,7 @@ interface RegisterUserBody {
 interface BlockUserBody {
     direccion_correo: string;
     clave: string;
-    direccion_bloqueada: number;
+    direccion_bloqueada: string;
 }
 
 interface BookmarkEmailBody {
@@ -51,7 +51,7 @@ export const blockUserController = async (ctx: Context) => {
         await blockUser(direccion_correo, clave, direccion_bloqueada);
         const date = new Date();
         //log the user blocking
-        console.log(`[${date}] : User with ID ${direccion_bloqueada} was blocked succesfully for user ${direccion_correo}.`);
+        console.log(`[${date}] : User ${direccion_bloqueada} was blocked succesfully for user ${direccion_correo}.`);
         return { status: 200, message: "The request was successful" };
     } catch (err) {
         const date = new Date();
