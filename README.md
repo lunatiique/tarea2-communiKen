@@ -11,13 +11,14 @@ To be able to run the project, you first need to install these two elements on y
 Execute the following command in your shell to install the necessary dependencies for the project :
 
 ```bash
-bun add pg
-bun add typescript @types/node @types/pg
+cd api
+bun install
 ```
 
 ### Dependencies to add for client
 
 Execute the following command in your shell to install the necessary dependencies for the project :
+
 ```bash
 pip install -r requirements.txt
 ```
@@ -54,7 +55,7 @@ bun run api/src/index.ts
   {
     "direccion_correo": "alice@example.com",
     "clave": "alice123",
-    "direccion_bloqueada": 3
+    "direccion_bloqueada": "bob@example.com"
   }
   ```
 
@@ -99,4 +100,3 @@ Navigate to the client directory and run `prompt.py`:
 ```bash
 py client/prompt.py
 ```
-
