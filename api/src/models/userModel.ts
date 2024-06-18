@@ -58,14 +58,18 @@ export const getEmailbyUserId = async (id: number) => {
     return res.rows[0];
 };
 
-export const addFavoriteEmail = async (email: string, clave: string, direccion_favorita: number, categoria: string) => {
+export const addFavoriteEmail = async (email: string, clave: string, direccion_favorita: string, categoria: string) => {
     const user = await getUserByEmail(email);
+    const favorite = await getUserByEmail(direccion_favorita);
     if (!user || user.clave !== clave) {
         throw new Error('Invalid email or password');
     }
+    if (!favorite) {
+        throw new Error('Invalid favorite email');
+    }
     const fecha_agregado = new Date();
     const text = 'INSERT INTO direccion_favorita(usuario_id, direccion_favorita, fecha_agregado, categoria) VALUES($1, $2, $3, $4) RETURNING *';
-    const values = [user.id, direccion_favorita, fecha_agregado, categoria];
+    const values = [user.id, favorite.id, fecha_agregado, categoria];
     const res = await query(text, values);
     return res.rows[0];
 };

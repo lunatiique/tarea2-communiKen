@@ -18,7 +18,7 @@ interface BlockUserBody {
 interface BookmarkEmailBody {
     direccion_correo: string;
     clave: string;    
-    direccion_favorita: number;
+    direccion_favorita: string;
     categoria: string;
 }
 
@@ -98,7 +98,7 @@ export const bookmarkEmail = async (ctx: Context) => {
         await addFavoriteEmail(direccion_correo, clave, direccion_favorita, categoria);
         return { status: 200, message: "The request was successful" };
     } catch (err) {
-        return { status: 400, message: "There was an error in making the request", error: (err as Error).message };
+        return { status: 400, message: "There was an error in making the request", error: (err as Error).message, code: (err as Error & { code?: string }).code};
     }
 };
 
