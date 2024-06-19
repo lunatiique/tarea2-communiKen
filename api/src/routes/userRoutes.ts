@@ -2,8 +2,10 @@
 import { Elysia } from 'elysia';
 import { registerUser, blockUserController, getUserInfo, authenticateUser, bookmarkEmail, deselectEmail, getListOffavoriteEmails } from '../controllers/userController';
 
+// Create a new Elysia app
 const app = new Elysia();
 
+// Define the routes for the user actions
 app.post('/api/registrar', registerUser);
 app.post('/api/bloquear', blockUserController);
 app.get('/api/informacion/:correo', getUserInfo);

@@ -17,20 +17,25 @@ endpoints = {
 
 # Function to authenticate user
 def authenticate(email, password):
+    # Construct the full URL for the authentication endpoint
     url = base_url + endpoints["autenticar"]
+    # Create the payload with the user's email and password
     data = {"direccion_correo": email, "clave": password}
     try:
+        # Send a POST request to the authentication endpoint with the payload
         response = requests.post(url, json=data, timeout=5)
+        # Check if the response status is not 200
         if response.json()["status"] != 200:
             print("Error:", response.json()["message"])
             return False
-        #check if status element of json response is 200
+        # Return True if the status is 200
         return response.json()["status"] == 200
     except requests.exceptions.ConnectionError:
+        # Handle the case where the server is not reachable
         print("Issue with webserver. Please try again later.")
         return False
 
-# Function to display menu
+# Function to display the menu
 def display_menu():
     print()
     print("1. View information about an email address")
@@ -39,27 +44,35 @@ def display_menu():
     print("4. Terminate the client execution")
     print()
 
-# Function to get email information
+# Function to get information about an email address
 def get_email_info(email):
+    # Construct the full URL for the email information endpoint
     url = base_url + endpoints["informacion"] + email
-    try :
+    try:
+        # Send a GET request to the email information endpoint
         response = requests.get(url)
+        # Check if the response status is not 200
         if response.json()["status"] != 200:
-                print("Error:", response.json()["message"])
+            print("Error:", response.json()["message"])
         elif response.json()["status"] == 200:
+            # Print the email information if the status is 200
             print("Information about the email address:")
             print("   Email: ", response.json()["direccion_correo"])
             print("   Name: ", response.json()["nombre"])
             print("   Description: ", response.json()["descripcion"])
             print()  # Add an empty line for better readability
     except requests.exceptions.ConnectionError:
+        # Handle the case where the server is not reachable
         print("Issue with webserver. Please try again later.")
 
 # Function to see email addresses marked as favorites
 def get_favorite_emails(email):
+    # Construct the full URL for the favorite emails endpoint
     url = base_url + endpoints["listadofavoritos"] + email
     try:
+        # Send a GET request to the favorite emails endpoint
         response = requests.get(url)
+        # Check if the response status is 200
         if response.json()["status"] == 200:
             print("Email addresses marked as favorites:")
             i = 1
@@ -75,17 +88,22 @@ def get_favorite_emails(email):
             print(response.json()["message"])
             print("Error:", response.json()["error"])
     except requests.exceptions.ConnectionError:
+        # Handle the case where the server is not reachable
         print("Issue with webserver. Please try again later.")
 
-# Function to mark email as favorite
+# Function to mark an email address as favorite
 def mark_email_favorite(email, password, favorite_email, category):
+    # Construct the full URL for the mark email as favorite endpoint
     url = base_url + endpoints["marcarcorreo"]
+    # Create the payload with the necessary data
     data = {"direccion_correo": email, "clave": password, "direccion_favorita": favorite_email, "categoria": category}
     try:
+        # Send a POST request to mark the email as favorite
         response = requests.post(url, json=data)
+        # Check if the response status is not 200
         if response.json()["status"] != 200:
             print()
-            #verify if code of json response is defined 
+            # Check if the response contains a specific error code
             if "code" in response.json():
                 if response.json()["code"] == "P2002":
                     print("Error: Email already marked as favorite.")
@@ -95,31 +113,38 @@ def mark_email_favorite(email, password, favorite_email, category):
                 print("Error: ", response.json()["error"])
         return response.json()["status"] == 200
     except requests.exceptions.ConnectionError:
+        # Handle the case where the server is not reachable
         print("Issue with webserver. Please try again later.")
         return False
 
-# Main function
+# Main function to run the program
 def main():
+    # Get the user's email and password
     email_connected = input("Enter your email: ")
     password = input("Enter your password: ")
 
+    # Authenticate the user
     if not authenticate(email_connected, password):
         print("Exiting...")
         return
 
     while True:
+        # Display the menu and get the user's choice
         display_menu()
         choice = input("Enter your choice: ")
 
         if choice == "1":
+            # Get information about a specific email address
             print()
             email = input("Enter the email address: ")
             print()
             get_email_info(email)
         elif choice == "2":
+            # Get the list of favorite email addresses
             print()
             get_favorite_emails(email_connected)
         elif choice == "3":
+            # Mark a specific email address as favorite
             print()
             favorite_email = input("Enter the email address to mark as favorite: ")
             category = input("Enter the category (you can leave it empty): ")
@@ -131,10 +156,12 @@ def main():
                 print("Failed to mark email address as favorite.")
                 print()
         elif choice == "4":
+            # Exit the program
             print()
             print("Exiting...")
             break
         else:
+            # Handle invalid menu choices
             print()
             print("Invalid choice. Please try again.")
 
