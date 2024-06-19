@@ -77,7 +77,6 @@ def get_favorite_emails(email):
             print("Email addresses marked as favorites:")
             i = 1
             for email in response.json()["list"]:
-                print("email : ", email)
                 print()  # Add an empty line for better readability
                 print("Favorite ", i)
                 print("   Email: ", email["direccion_favorita"])
