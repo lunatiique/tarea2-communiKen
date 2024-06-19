@@ -25,13 +25,13 @@ pip install -r requirements.txt
 
 ### Setting Up the Database
 
-Our .env variable for connecting to database with prisma :
+Set the environement variable DATABASE_URL in the .env file to connect the database with prisma :
 ```bash
 DATABASE_URL="postgresql://postgres:020202@localhost:5432/communiken"
 ```
 
 - Run PostgreSQL on your localhost.
-- Set the password of the `postgres` user to `020202` (or modify the configuration in `db.ts`).
+- Set the password of the `postgres` user to `020202` (or modify the environement variable to match).
 - Create a database named `communiken`.
 - Execute the two SQL scripts to create the tables and insert data for test purposes. (you can find them in api/database)
   
