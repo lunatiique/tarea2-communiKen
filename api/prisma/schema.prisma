@@ -1,12 +1,16 @@
+// Generador de cliente Prisma
 generator client {
   provider = "prisma-client-js"
 }
 
+// Fuente de datos
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+
+// Modelo para la tabla de 'correo'
 model correo {
   id                                      Int      @id @default(autoincrement())
   remitente_id                            Int
@@ -20,6 +24,7 @@ model correo {
   usuario_correo_remitente_idTousuario    usuario  @relation("correo_remitente_idTousuario", fields: [remitente_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
+// Modelo para la tabla de 'direccion_bloqueada'
 model direccion_bloqueada {
   usuario_id                                               Int
   direccion_bloqueada                                      Int
@@ -30,6 +35,7 @@ model direccion_bloqueada {
   @@id([usuario_id, direccion_bloqueada])
 }
 
+// Modelo para la tabla de 'direccion_favorita'
 model direccion_favorita {
   usuario_id                                             Int
   direccion_favorita                                     Int
@@ -41,6 +47,7 @@ model direccion_favorita {
   @@id([usuario_id, direccion_favorita])
 }
 
+// Modelo para la tabla de 'usuario'
 model usuario {
   id                                                                   Int                   @id @default(autoincrement())
   direccion_correo                                                     String                @unique @db.VarChar
