@@ -1,6 +1,6 @@
 ## Project Setup
 
-To be able to run the project, you first need to install these two elements on your device :
+To be able to run the project, you first need to install these three softwares on your device :
 
 - [bun](https://bun.sh/docs/installation)
 - [Python](https://www.python.org/downloads/)
@@ -26,6 +26,7 @@ pip install -r requirements.txt
 ### Setting Up the Database
 
 Set the environement variable DATABASE_URL in the .env file to connect the database with prisma :
+
 ```bash
 DATABASE_URL="postgresql://postgres:020202@localhost:5432/communiken"
 ```
@@ -104,4 +105,8 @@ Navigate to the client directory and run `prompt.py`:
 
 ```bash
 py client/prompt.py
+```
+or (depending on your OS)
+```bash
+python client/prompt.py
 ```
