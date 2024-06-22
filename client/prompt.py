@@ -57,9 +57,9 @@ def get_email_info(email):
         elif response.json()["status"] == 200:
             # Printea la informacion del correo si el status es 200
             print("Information about the email address:")
-            print("   Email: ", response.json()["direccion_correo"])
-            print("   Name: ", response.json()["nombre"])
-            print("   Description: ", response.json()["descripcion"])
+            print("   Email: ", response.json()["user"]["direccion_correo"])
+            print("   Name: ", response.json()["user"]["nombre"])
+            print("   Description: ", response.json()["user"]["descripcion"])
             print()  # Agrega una linea vacia para una mejor legibilidad
     except requests.exceptions.ConnectionError:
         # Manejar el caso en el que no se puede acceder al servidor
