@@ -1,10 +1,10 @@
 import requests
 import json
 
-# Define the base URL of the webserver
+# Definir la base URL del servidor web
 base_url = "http://localhost:3000"
 
-# Define the endpoints
+# Definir los endpoints
 endpoints = {
     "registrar": "/api/registrar",
     "bloquear": "/api/bloquear",
@@ -15,27 +15,27 @@ endpoints = {
     "listadofavoritos": "/api/listadofavoritos/"
 }
 
-# Function to authenticate user
+# Funcion de autenticacion del usuario
 def authenticate(email, password):
-    # Construct the full URL for the authentication endpoint
+    # Se contruye el URL completo para el endpoint de autenticacion
     url = base_url + endpoints["autenticar"]
-    # Create the payload with the user's email and password
+    # Se crea payload con el correo y la contraseña del usuario
     data = {"direccion_correo": email, "clave": password}
     try:
-        # Send a POST request to the authentication endpoint with the payload
+        # Envia a POST la solicitud de la autenticacion del endpoint con un payload 
         response = requests.post(url, json=data, timeout=5)
-        # Check if the response status is not 200
+        # Revisa si el estado de la respuesta no es 200
         if response.json()["status"] != 200:
             print("Error:", response.json()["message"])
             return False
-        # Return True if the status is 200
+        # Retorna True si el estado es 200
         return response.json()["status"] == 200
     except requests.exceptions.ConnectionError:
-        # Handle the case where the server is not reachable
+        # Aqui se maneja el caso en el que no se pueda acceder al servidor
         print("Issue with webserver. Please try again later.")
         return False
 
-# Function to display the menu
+# Funcion que muestra el menu de opciones al usuario
 def display_menu():
     print()
     print("1. View information about an email address")
@@ -44,65 +44,65 @@ def display_menu():
     print("4. Terminate the client execution")
     print()
 
-# Function to get information about an email address
+# Funcion que obtiene y muestra informacion sobre una direccion de correo especifica
 def get_email_info(email):
-    # Construct the full URL for the email information endpoint
+    # Construye el URL completo para la informacion de correo endpoint 
     url = base_url + endpoints["informacion"] + email
     try:
-        # Send a GET request to the email information endpoint
+        # Envia un GET de solicitud para la informacion del correo endpoint 
         response = requests.get(url)
-        # Check if the response status is not 200
+        # Revisa si el estado de la respuesta no es 200 
         if response.json()["status"] != 200:
             print("Error:", response.json()["message"])
         elif response.json()["status"] == 200:
-            # Print the email information if the status is 200
+            # Printea la informacion del correo si el status es 200
             print("Information about the email address:")
             print("   Email: ", response.json()["direccion_correo"])
             print("   Name: ", response.json()["nombre"])
             print("   Description: ", response.json()["descripcion"])
-            print()  # Add an empty line for better readability
+            print()  # Agrega una linea vacia para una mejor legibilidad
     except requests.exceptions.ConnectionError:
-        # Handle the case where the server is not reachable
+        # Manejar el caso en el que no se puede acceder al servidor
         print("Issue with webserver. Please try again later.")
 
-# Function to see email addresses marked as favorites
+# Funcion que obtiene y muestra una lista de direcciones de correo marcadas como favoritas
 def get_favorite_emails(email):
-    # Construct the full URL for the favorite emails endpoint
+    # Construye el URL completo para los correos favoritos de endpoint Construct the full URL for the favorite emails endpoint
     url = base_url + endpoints["listadofavoritos"] + email
     try:
-        # Send a GET request to the favorite emails endpoint
+        # Envia un GET solicitado para los correos favoritos de endpoint 
         response = requests.get(url)
-        # Check if the response status is 200
+        # Revisa si el estado de la respuesta es 200
         if response.json()["status"] == 200:
             print("Email addresses marked as favorites:")
             i = 1
             for email in response.json()["list"]:
-                print()  # Add an empty line for better readability
+                print()  # Se agrega una línea vacía para una mejor legibilidad
                 print("Favorite ", i)
                 print("   Email: ", email["direccion_favorita"])
                 print("   Category: ", email["categoria"])
                 i += 1
-                print()  # Add an empty line for better readability
+                print()  # Se agrega una linea vacia para mejor visibilidad
         elif response.json()["status"] != 200:
             print(response.json()["message"])
             print("Error:", response.json()["error"])
     except requests.exceptions.ConnectionError:
-        # Handle the case where the server is not reachable
+        # Maneja el caso en el que no se puede acceder al servidor
         print("Issue with webserver. Please try again later.")
 
-# Function to mark an email address as favorite
+# Funcion para marcar un correo como favorito
 def mark_email_favorite(email, password, favorite_email, category):
-    # Construct the full URL for the mark email as favorite endpoint
+    # Construye el URL completo para marcar el correo como favorito endpoint 
     url = base_url + endpoints["marcarcorreo"]
-    # Create the payload with the necessary data
+    # Crea ¿el payload con los datos necesarios.
     data = {"direccion_correo": email, "clave": password, "direccion_favorita": favorite_email, "categoria": category}
     try:
-        # Send a POST request to mark the email as favorite
+        # Envia un POST pedido para marcar el correo como favorito 
         response = requests.post(url, json=data)
-        # Check if the response status is not 200
+        # Revisa si la respuesta del estado no es 200 
         if response.json()["status"] != 200:
             print()
-            # Check if the response contains a specific error code
+            # Revisa si la respuesta contiene un error de codigo especifico
             if "code" in response.json():
                 if response.json()["code"] == "P2002":
                     print("Error: Email already marked as favorite.")
@@ -112,38 +112,38 @@ def mark_email_favorite(email, password, favorite_email, category):
                 print("Error: ", response.json()["error"])
         return response.json()["status"] == 200
     except requests.exceptions.ConnectionError:
-        # Handle the case where the server is not reachable
+        # Maneja el caso donde no es accesible 
         print("Issue with webserver. Please try again later.")
         return False
 
-# Main function to run the program
+# funcion main para correr el programa
 def main():
-    # Get the user's email and password
+    # Obtiene el mail y contraseña de un usuario 
     email_connected = input("Enter your email: ")
     password = input("Enter your password: ")
 
-    # Authenticate the user
+    # Autentica el usuario
     if not authenticate(email_connected, password):
         print("Exiting...")
         return
 
     while True:
-        # Display the menu and get the user's choice
+        # Muestra el menu y obtiene la eleccion del usuario 
         display_menu()
         choice = input("Enter your choice: ")
 
         if choice == "1":
-            # Get information about a specific email address
+            # Conseguimos la informacion sobre un correo en especifico 
             print()
             email = input("Enter the email address: ")
             print()
             get_email_info(email)
         elif choice == "2":
-            # Get the list of favorite email addresses
+            # Conseguimos la lista de correos favoritos 
             print()
             get_favorite_emails(email_connected)
         elif choice == "3":
-            # Mark a specific email address as favorite
+            # Marcamos el correo especifico como favorito
             print()
             favorite_email = input("Enter the email address to mark as favorite: ")
             category = input("Enter the category (you can leave it empty): ")
@@ -155,12 +155,12 @@ def main():
                 print("Failed to mark email address as favorite.")
                 print()
         elif choice == "4":
-            # Exit the program
+            # Salir del programa
             print()
             print("Exiting...")
             break
         else:
-            # Handle invalid menu choices
+            # Manejamos el caso de opciones de menus invalidos 
             print()
             print("Invalid choice. Please try again.")
 
